@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* 页面背景色和字体 */
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Arial', sans-serif;
+        }
+        /* 表格容器，启用水平滚动条 */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: white;
+        }
+        /* 表格样式 */
+        .table {
+            margin-bottom: 0;
+        }
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: #f2f2f2;
+        }
+        .table-hover tbody tr:hover {
+            background-color: #e0e0e0;
+        }
+        .table th, .table td {
+            white-space: nowrap;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .table td:last-child {
+            text-align: left;
+        }
+        /* 导航栏样式 */
+        .navbar {
+            background-color: #08060b;
+            padding: 10px 15px;
+        }
+        .navbar-brand img {
+            height: 50px;
+            width: 50px;
+            border-radius: 50%;
+            margin-right: 10px;
+            transition: transform 0.3s;
+        }
+        .navbar-brand img:hover {
+            transform: scale(1.1);
+        }
+        .navbar-brand {
+            color: #fff;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        /* 页眉样式 */
+        .header h1 {
+            font-size: 2.5rem;
+            color: #050308;
+            margin-bottom: 20px;
+        }
+        /* 按钮样式 */
+        .btn-custom {
+            background: linear-gradient(45deg, #09060e, #090513);
+            border: none;
+            color: #fff;
+            transition: background 0.3s ease;
+        }
+        .btn-custom:hover {
+            background: linear-gradient(45deg, #130b26, #0b0622);
+        }
+        /* 卡片样式 */
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: scale(1.05);
+        }
+        /* 状态颜色 */
+        .settled {
+            color: green;
+        }
+        .unsettled {
+            color: red;
+        }
+        .dropdown-settled {
+            background-color: #d4edda;
+        }
+        .dropdown-unsettled {
+            background-color: #f8d7da;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 顶部导航栏，包含 Logo 和标题 -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand" href="#">
+            <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo">
+            SCHOOL俱乐部报单管理系统
+        </a>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="header text-center">
+            <h1>订单列表</h1>
+        </div>
+        <div class="d-flex justify-content-center mb-4">
+            <!-- 新增订单按钮 -->
+            <a href="{{ url_for('new_order') }}" class="btn btn-custom mx-1">新增订单</a>
+            <!-- 全部导出按钮 -->
+            <a href="{{ url_for('export_report', report_type='all') }}" class="btn btn-custom mx-1">全部导出</a>
+            <!-- 按月导出日期选择器和按钮 -->
+            <input type="month" id="exportMonth" class="form-control mx-1" style="width: 200px;">
+            <button class="btn btn-custom mx-1" onclick="exportByMonth()">按月导出</button>
+        </div>
+        
+        <!-- 统计信息展示区域 -->
+        <div class="row text-center mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">总订单</h5>
+                        <p class="card-text">{{ total_orders }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">总流水</h5>
+                        <p class="card-text">{{ total_price }} 元</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">总抽成</h5>
+                        <p class="card-text">{{ total_commission }} 元</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">总到手</h5>
+                        <p class="card-text">{{ total_final_amount }} 元</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 表格外部容器，启用水平滚动 -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>订单号</th>
+                        <th>订单时间</th>
+                        <th>结算状态</th>
+                        <th>老板名称</th>
+                        <th>陪玩名称</th>
+                        <th>游戏类型</th>
+                        <th>价格</th>
+                        <th>陪玩时长</th>
+                        <th>甜蜜称呼</th>
+                        <th>总价</th>
+                        <th>抽成</th>
+                        <th>最终到手</th>
+                        <th>是否收款</th>
+                        <th>备注说明</th>
+                        <th>查看详情</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.order_time }}</td>
+                        <td>
+                            <form action="{{ url_for('update_settlement_status', order_id=order.id) }}" method="post">
+                                <select name="settlement_status" class="{% if order.is_settled %}dropdown-settled{% else %}dropdown-unsettled{% endif %}" onchange="this.form.submit()">
+                                    <option value="未结" class="unsettled" {% if not order.is_settled %} selected {% endif %}>未结</option>
+                                    <option value="已结" class="settled" {% if order.is_settled %} selected {% endif %}>已结</option>
+                                </select>
+                            </form>
+                        </td>
+                        <td>{{ order.boss_name }}</td>
+                        <td>{{ order.play_name }}</td>
+                        <td>{{ order.game_type }}</td>
+                        <td>{{ order.price }}</td>
+                        <td>{{ order.play_time }}</td>
+                        <td>{{ order.sweet_name }}</td>
+                        <td>{{ order.total_price }}</td>
+                        <td>{{ order.commission | round(2) }}</td>
+                        <td>{{ order.final_amount | round(2) }}</td>
+                        <td>
+                            <form action="{{ url_for('update_payment_status', order_id=order.id) }}" method="post">
+                                <select name="payment_status" class="{% if order.is_paid %}dropdown-settled{% else %}dropdown-unsettled{% endif %}" onchange="this.form.submit()">
+                                    <option value="未收" class="unsettled" {% if not order.is_paid %} selected {% endif %}>未收</option>
+                                    <option value="已收" class="settled" {% if order.is_paid %} selected {% endif %}>已收</option>
+                                </select>
+                            </form>
+                        </td>
+                        <td>{{ order.remarks }}</td>
+                        <td><a href="{{ url_for('order_details', order_id=order.id) }}" class="btn btn-info btn-sm">查看详情</a></td>
+                        <td>
+                            <form action="{{ url_for('delete_order', order_id=order.id) }}" method="post">
+                                <button type="submit" class="btn btn-danger btn-sm">删除</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function exportByMonth() {
+            const selectedMonth = document.getElementById('exportMonth').value;
+            if (selectedMonth) {
+                // 将月份传递到后端的按月导出路由
+                window.location.href = "{{ url_for('export_report_by_month', month='') }}" + selectedMonth;
+            } else {
+                alert("请选择一个月份");
+            }
+        }
+    </script>
+</body>
+</html>

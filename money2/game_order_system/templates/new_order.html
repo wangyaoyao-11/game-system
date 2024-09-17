@@ -1,0 +1,419 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card shadow-sm mx-auto" style="max-width: 900px;">
+        <div class="card-header bg-dark text-white text-center">
+            <h2 class="mb-0">填报订单</h2>
+        </div>
+        <div class="card-body">
+            <form id="order-form" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="boss_name">老板名称:</label>
+                    <input type="text" class="form-control" name="boss_name" placeholder="请输入老板名称" required>
+                    <small class="form-text text-muted">Tips: 如不清楚可咨询店长。</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="play_name">陪玩名称:</label>
+                    <input type="text" class="form-control" name="play_name" placeholder="请输入陪玩名称" required>
+                    <small class="form-text text-muted">Tips: 保证大群ID、派单群ID与此处填写一致。</small>
+                </div>
+
+                <hr>
+
+                <div class="form-group">
+                    <label for="game_type">游戏类型:</label>
+                    <select class="form-control" id="game_type" name="game_type" required>
+                        <option value="">请选择游戏类型</option>
+                        <option value="永劫无间">永劫无间</option>
+                        <option value="无畏契约">无畏契约</option>
+                        <option value="其他游戏">其他游戏</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="additional-options" style="display: none;">
+                    <label for="extra_options">附加选项:</label>
+                    <small class="form-text text-muted">Tips: 请选择相应的游戏身份以及陪玩模式</small>
+                    <select class="form-control" id="extra_options" name="extra_options">
+                        <option value="">请选择附加选项</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="pricing-type" style="display: none;">
+                    <label for="pricing_type">计价方式:</label>
+                    <select class="form-control" id="pricing_type" name="pricing_type">
+                        <option value="">请选择计价方式</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="rank-options" style="display: none;">
+                    <label for="rank">段位:</label>
+                    <select class="form-control" id="rank" name="rank">
+                        <option value="">请选择段位</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="additional-income" style="display: none;">
+                    <label for="additional_income">额外收入:</label>
+                    <select class="form-control" id="additional_income" name="additional_income">
+                        <option value="">请选择额外收入</option>
+                        <option value="一陪多-钻石以下">一陪多-钻石以下 (+5元)</option>
+                        <option value="一陪多-钻石以上">一陪多-钻石以上 (+10元)</option>
+                        <option value="外服">外服 (+5元)</option>
+                    </select>
+                    <small class="form-text text-muted">Tips: 当一陪一时，点击请选择额外收入即可。</small>
+                </div>
+
+                <div class="form-group" id="price-display" style="display: none;">
+                    <label for="price">单价:</label>
+                    <input type="text" class="form-control" id="price" name="price" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="play_time">陪玩时长 (小时):</label>
+                    <input type="number" class="form-control" id="play_time" name="play_time" placeholder="请输入陪玩时长" required>
+                    <small class="form-text text-muted">Tips: 不论是局还是小时，几局/几小时，只需要输入数字即可。</small>
+                </div>
+
+                <div class="form-group" id="total-price-display" style="display: none;">
+                    <label for="total_price">总价:</label>
+                    <input type="text" class="form-control" id="total_price" name="total_price" readonly>
+                    <small class="form-text text-muted">Tips: 总价=(单价+额外收入)✖️陪玩时长+甜蜜称呼。</small>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input type="checkbox" class="form-check-input" name="sweet_name">
+                    <label class="form-check-label" for="sweet_name">甜蜜称呼</label>
+                    <small class="form-text text-muted">Tips: 有就选，没有就不选。</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="win_image">战绩图:</label>
+                    <input type="file" class="form-control-file" name="win_image">
+                </div>
+
+                <div class="form-group">
+                    <label for="other_image">其他截图凭证:</label>
+                    <input type="file" class="form-control-file" name="other_image">
+                </div>
+
+                <div class="form-group" id="remarks-display" style="display: none;">
+                    <label for="remarks">备注说明:</label>
+                    <textarea class="form-control" id="remarks" name="remarks" readonly></textarea>
+                </div>
+
+                <hr>
+                
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary">提交</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const gameTypeSelect = document.getElementById('game_type');
+    const extraOptionsSelect = document.getElementById('extra_options');
+    const additionalOptionsDiv = document.getElementById('additional-options');
+    const pricingTypeDiv = document.getElementById('pricing-type');
+    const pricingTypeSelect = document.getElementById('pricing_type');
+    const rankOptionsDiv = document.getElementById('rank-options');
+    const rankSelect = document.getElementById('rank');
+    const priceDisplay = document.getElementById('price');
+    const priceDisplayDiv = document.getElementById('price-display');
+    const playTimeInput = document.getElementById('play_time');
+    const totalPriceDisplay = document.getElementById('total_price');
+    const totalPriceDisplayDiv = document.getElementById('total-price-display');
+    const additionalIncomeSelect = document.getElementById('additional_income');
+    const additionalIncomeDiv = document.getElementById('additional-income');
+
+    const options = {
+        '永劫无间': [],
+        '无畏契约': [
+            { value: '无畏契约技术女陪', text: '无畏契约技术女陪' },
+            { value: '无畏契约娱乐女陪', text: '无畏契约娱乐女陪' },
+            { value: '无畏契约娱乐男陪', text: '无畏契约娱乐男陪' },
+            { value: '无畏契约技术男陪', text: '无畏契约技术男陪' }
+        ]
+    };
+
+    const prices = {
+        '永劫无间': {
+            '陨星以下及匹配': 40,
+            '陨星': 45,
+            '饕月': 50,
+            '坚日': 55,
+            '修罗': 65,
+            '无双': 75,
+            '天人之战': {
+                '大师一段': 40,
+                '大师二段': 50,
+                '大师三段': 60,
+                '大师四段': 70,
+                '刀房': 45
+            }
+        },
+        '无畏契约技术女陪': {
+            '局': {
+                '匹配': 30,
+                '黄金': 40,
+                '白金': 50,
+                '钻石': 60,
+                '超凡': 70,
+                '神话': 80
+            },
+            '小时': {
+                '匹配': 40,
+                '黄金': 60,
+                '白金': 70,
+                '钻石': 80,
+                '超凡': 100,
+                '神话': 120
+            }
+        },
+        '无畏契约娱乐女陪': {
+            '局': {
+                '匹配': 25,
+                '黄金': 30,
+                '白金': 35,
+                '钻石': 40
+            },
+            '小时': {
+                '匹配': 35,
+                '黄金': 40,
+                '白金': 45,
+                '钻石': 55
+            }
+        },
+        '无畏契约技术男陪': {
+            '局': {
+                '匹配': 30,
+                '黄金': 40,
+                '白金': 50,
+                '钻石': 60,
+                '超凡': 70,
+                '神话': 80
+            },
+            '小时': {
+                '匹配': 40,
+                '黄金': 55,
+                '白金': 65,
+                '钻石': 75,
+                '超凡': 95,
+                '神话': 115
+            }
+        },
+        '无畏契约娱乐男陪': {
+            '局': {
+                '匹配': 25,
+                '黄金': 30,
+                '白金': 35,
+                '钻石': 40
+            },
+            '小时': {
+                '匹配': 35,
+                '黄金': 40,
+                '白金': 45,
+                '钻石': 55
+            }
+        }
+    };
+
+    gameTypeSelect.addEventListener('change', function() {
+    const gameType = this.value;
+    extraOptionsSelect.innerHTML = '<option value="">请选择附加选项</option>';
+    rankSelect.innerHTML = '<option value="">请选择段位</option>';
+    priceDisplay.value = '';
+    pricingTypeSelect.innerHTML = '<option value="">请选择计价方式</option>';
+    additionalIncomeSelect.innerHTML = '<option value="">请选择额外收入</option>';
+
+    if (gameType === '永劫无间') {
+        pricingTypeDiv.style.display = 'none'; 
+        additionalIncomeDiv.style.display = 'none'; 
+        rankOptionsDiv.style.display = 'block';
+        for (const rank in prices['永劫无间']) {
+            if (typeof prices['永劫无间'][rank] === 'object') {
+                for (const subRank in prices['永劫无间'][rank]) {
+                    const opt = document.createElement('option');
+                    opt.value = rank + '-' + subRank; //组合选项
+                    opt.textContent = rank + '-' + subRank; //显示组合选项
+                    rankSelect.appendChild(opt);
+                }
+            } else {
+                const opt = document.createElement('option');
+                opt.value = rank;
+                opt.textContent = rank;
+                rankSelect.appendChild(opt);
+            }
+        }
+    } else if (options[gameType]) {
+        pricingTypeDiv.style.display = 'none';
+        additionalOptionsDiv.style.display = 'block';
+        additionalIncomeDiv.style.display = 'block';
+        options[gameType].forEach(option => {
+            const opt = document.createElement('option');
+            opt.value = option.value;
+            opt.textContent = option.text;
+            extraOptionsSelect.appendChild(opt);
+        });
+    } else if (gameType === '其他游戏') {
+        priceDisplay.value = 40; // 设置其他游戏的单价为40元
+        priceDisplayDiv.style.display = 'block'; // 显示单价
+    } else {
+        additionalOptionsDiv.style.display = 'none';
+        pricingTypeDiv.style.display = 'none';
+        rankOptionsDiv.style.display = 'none';
+        additionalIncomeDiv.style.display = 'none';
+        priceDisplayDiv.style.display = 'none';
+    }
+});
+
+    extraOptionsSelect.addEventListener('change', function() {
+    const extraOption = this.value;
+    rankSelect.innerHTML = '<option value="">请选择段位</option>';
+    priceDisplay.value = '';
+    pricingTypeSelect.innerHTML = '<option value="">请选择计价方式</option>';
+    additionalIncomeSelect.innerHTML = '<option value="">请选择额外收入</option>';  // 清空并重新插入
+
+    if (prices[extraOption]) {
+        pricingTypeDiv.style.display = 'block';
+        pricingTypeSelect.innerHTML += `
+            <option value="局">按局</option>
+            <option value="小时">按小时</option>
+        `;
+
+        // 插入额外收入选项
+        additionalIncomeSelect.innerHTML += `
+            <option value="一陪多-钻石以下">一陪多-钻石以下 (+5元)</option>
+            <option value="一陪多-钻石以上">一陪多-钻石以上 (+10元)</option>
+            <option value="外服">外服 (+5元)</option>
+        `;
+
+        additionalIncomeDiv.style.display = 'block'; // 显示额外收入的选择框
+    } else {
+        pricingTypeDiv.style.display = 'none';
+        additionalIncomeDiv.style.display = 'none';
+        rankOptionsDiv.style.display = 'none';
+        priceDisplayDiv.style.display = 'none';
+    }
+});
+
+    pricingTypeSelect.addEventListener('change', function() {
+        const pricingType = this.value;
+        const extraOption = extraOptionsSelect.value;
+        rankSelect.innerHTML = '<option value="">请选择段位</option>';
+        priceDisplay.value = '';
+
+        if (prices[extraOption] && prices[extraOption][pricingType]) {
+            for (const rank in prices[extraOption][pricingType]) {
+                const opt = document.createElement('option');
+                opt.value = rank;
+                opt.textContent = rank;
+                rankSelect.appendChild(opt);
+            }
+            rankOptionsDiv.style.display = 'block';
+        } else {
+            rankOptionsDiv.style.display = 'none';
+            priceDisplayDiv.style.display = 'none';
+        }
+    });
+
+    rankSelect.addEventListener('change', function() {
+        const rank = this.value.split('-'); //拆分组合选项
+        const category = rank[0];
+        const subCategory = rank[1];
+        const extraOption = extraOptionsSelect.value;
+        const pricingType = pricingTypeSelect.value;
+
+        if (category && subCategory && prices['永劫无间'][category] && prices['永劫无间'][category][subCategory]) {
+            priceDisplay.value = prices['永劫无间'][category][subCategory];
+            priceDisplayDiv.style.display = 'block';
+        } else if (prices['永劫无间'][rank]) {
+            priceDisplay.value = prices['永劫无间'][rank];
+            priceDisplayDiv.style.display = 'block';
+        } else if (prices[extraOption] && prices[extraOption][pricingType] && prices[extraOption][pricingType][rank]) {
+            priceDisplay.value = prices[extraOption][pricingType][rank];
+            priceDisplayDiv.style.display = 'block';
+        } else {
+            priceDisplay.value = '';
+            priceDisplayDiv.style.display = 'none';
+        }
+
+        calculateTotalPrice();
+    });
+
+    additionalIncomeSelect.addEventListener('change', calculateTotalPrice);
+    playTimeInput.addEventListener('input', calculateTotalPrice);
+    // 添加甜蜜称呼事件监听
+    const sweetNameCheckbox = document.querySelector('input[name="sweet_name"]');
+    sweetNameCheckbox.addEventListener('change', calculateTotalPrice);
+
+    function calculateTotalPrice() {
+    const price = parseFloat(priceDisplay.value) || 0;
+    const playTime = parseFloat(playTimeInput.value) || 0;
+    let additionalIncome = 0;
+    let sweetNameFee = 0;
+
+    if (additionalIncomeSelect.value.includes('钻石以下')) {
+        additionalIncome = 5;
+    } else if (additionalIncomeSelect.value.includes('钻石以上')) {
+        additionalIncome = 10;
+    } else if (additionalIncomeSelect.value.includes('外服')) {
+        additionalIncome = 5;
+    }
+
+    // 检查甜蜜称呼是否被选中
+    const sweetNameCheckbox = document.querySelector('input[name="sweet_name"]');
+    if (sweetNameCheckbox && sweetNameCheckbox.checked) {
+        sweetNameFee = 10;  // 如果勾选甜蜜称呼，则加10元
+    }
+
+    const totalPrice = (price + additionalIncome) * playTime + sweetNameFee;
+    totalPriceDisplay.value = totalPrice.toFixed(2);
+    totalPriceDisplayDiv.style.display = 'block';
+}
+function updateRemarks() {
+    const gameType = gameTypeSelect.value;
+    const extraOption = extraOptionsSelect.value;
+    const pricingType = pricingTypeSelect.value;
+    const rank = rankSelect.value;
+    const additionalIncome = additionalIncomeSelect.value;
+    const sweetName = sweetNameCheckbox.checked ? '甜蜜称呼已选' : '甜蜜称呼未选';
+
+    let remarks = `游戏类型: ${gameType}\n`;
+
+    if (extraOption) {
+        remarks += `附加选项: ${extraOption}\n`;
+    }
+
+    if (pricingType) {
+        remarks += `计价方式: ${pricingType}\n`;
+    }
+
+    if (rank) {
+        remarks += `段位: ${rank}\n`;
+    }
+
+    if (additionalIncome) {
+        remarks += `额外收入: ${additionalIncome}\n`;
+    }
+
+    remarks += `${sweetName}\n`;
+
+    const remarksDisplay = document.getElementById('remarks');
+    remarksDisplay.value = remarks;
+    document.getElementById('remarks-display').style.display = 'block';
+}
+
+// 在已有的事件监听中，加入updateRemarks调用
+gameTypeSelect.addEventListener('change', updateRemarks);
+extraOptionsSelect.addEventListener('change', updateRemarks);
+pricingTypeSelect.addEventListener('change', updateRemarks);
+rankSelect.addEventListener('change', updateRemarks);
+additionalIncomeSelect.addEventListener('change', updateRemarks);
+sweetNameCheckbox.addEventListener('change', updateRemarks);
+   
+</script>
+{% endblock %}

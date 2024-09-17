@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCHOOL俱乐部报单管理系统</title>
+    <!-- 引入 Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .container {
+            max-width: 900px; /* 宽度调整 */
+            margin: auto;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 8px;
+            border: none;
+        }
+        .card-header {
+            background-color: #333;
+            color: white;
+            padding: 15px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+        .card-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+        }
+        hr {
+            border-top: 1px solid #f0f0f0;
+        }
+        .form-control {
+            border-radius: 5px;
+            padding: 10px;
+            box-shadow: none;
+            border: 1px solid #dcdcdc;
+            font-size: 16px; /* 调整字体大小 */
+        }
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 10px 20px; /* 改变按钮的左右内边距 */
+            width: auto; /* 调整按钮宽度 */
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        select.form-control {
+            height: calc(2.25rem + 10px); /* 调整选择框高度 */
+        }
+        /* 导航栏中的 logo 样式 */
+        .navbar-brand img {
+            height: 40px; /* 调整 logo 大小 */
+            width: 40px;
+            border-radius: 50%; /* 设置 logo 为圆形 */
+            margin-right: 10px;
+            transition: transform 0.3s; /* 增加悬停效果 */
+        }
+        .navbar-brand img:hover {
+            transform: scale(1.1); /* 悬停放大效果 */
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏，包含 Logo 和标题 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">
+            <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo"> <!-- 替换为你的 Logo 图片路径 -->
+            SCHOOL俱乐部报单管理系统
+        </a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('index') }}">订单列表</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('new_order') }}">新增订单</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- 引入 Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

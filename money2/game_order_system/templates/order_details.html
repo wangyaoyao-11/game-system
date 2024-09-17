@@ -1,0 +1,63 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>订单详情</title>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">订单详情</h1>
+
+        <div class="row">
+            <!-- 左侧订单信息 -->
+            <div class="col-md-6">
+                <p><strong>订单号:</strong> {{ order.id }}</p>
+                <p><strong>订单时间:</strong> {{ order.order_time }}</p>
+                <p><strong>老板名称:</strong> {{ order.boss_name }}</p>
+                <p><strong>陪玩名称:</strong> {{ order.play_name }}</p>
+                <p><strong>游戏类型:</strong> {{ order.game_type }}</p>
+                <p><strong>价格:</strong> {{ order.price }} 元</p>
+                <p><strong>陪玩时长:</strong> {{ order.play_time }} 小时</p>
+                <p><strong>甜蜜称呼:</strong> {{ order.sweet_name }}</p>
+                <p><strong>总价:</strong> {{ order.total_price }} 元</p>
+                <p><strong>抽成:</strong> {{ order.commission }} 元</p>
+                <p><strong>最终到手金额:</strong> {{ order.final_amount }} 元</p>
+                <p><strong>结算状态:</strong> {{ '已结' if order.is_settled else '未结' }}</p>
+                <p><strong>是否收款:</strong> {{ '已收' if order.is_paid else '未收' }}</p>
+
+                <!-- 详细显示总价计算方式 -->
+                <p>总价计算方式:</p>
+                <p>{{ order.base_price }} 元（基础价格） + {{ order.additional_option_price }} 元（附加选项价格） + {{ order.extra_income_price }} 元（额外收入） = {{ order.total_price }} 元</p>
+
+                <p><strong>抽成:</strong> {{ order.commission }} 元</p>
+                <p><strong>最终到手金额:</strong> {{ order.final_amount }} 元</p>
+                <p><strong>结算状态:</strong> {{ '已结' if order.is_settled else '未结' }}</p>
+                <p><strong>是否收款:</strong> {{ '已收' if order.is_paid else '未收' }}</p>
+                <p><strong>备注：</strong>{{ order.remarks }}</p> <!-- 显示备注 -->
+            </div>
+
+            <!-- 右侧图片展示 -->
+            <div class="col-md-6">
+                {% if order.win_image %}
+                <p><strong>战绩图:</strong></p>
+                <img src="{{ url_for('static', filename='uploads/' + order.win_image) }}" class="img-fluid" alt="Win Image">
+                {% endif %}
+
+                {% if order.other_image %}
+                <p><strong>其他截图凭证:</strong></p>
+                <img src="{{ url_for('static', filename='uploads/' + order.other_image) }}" class="img-fluid" alt="Other Image">
+                {% endif %}
+            </div>
+        </div>
+
+        <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">返回订单列表</a>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
